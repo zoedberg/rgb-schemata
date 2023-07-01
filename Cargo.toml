@@ -27,5 +27,4 @@ sha2 = "0.10.7"
 all=[]
 
 [patch.crates-io]
-rgb-core = { git = "https://github.com/RGB-WG/rgb-core" }
-rgb-std = { git = "https://github.com/RGB-WG/rgb-wallet" }
+rgb-std = { git = "https://github.com/zoedberg/rgb-wallet.git", branch = "old_master" }
