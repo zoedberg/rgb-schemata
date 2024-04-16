@@ -237,3 +237,88 @@ impl NonInflatableAsset {
 
     pub fn issue_contract_det(self, timestamp: i64) -> Result<Contract, BuilderError> { self.0.issue_contract_det(timestamp) }
 }
+
+#[cfg(test)]
+mod test {
+    use std::str::FromStr;
+
+    use bp::seals::txout::{BlindSeal, CloseMethod};
+    use bp::Txid;
+    use chrono::DateTime;
+    use rgbstd::containers::BuilderSeal;
+    use rgbstd::interface::*;
+    use rgbstd::invoice::Precision;
+    use rgbstd::persistence::PersistedState;
+    use rgbstd::stl::*;
+    use rgbstd::*;
+
+    use super::*;
+
+    #[test]
+    fn deterministic_contract_id() {
+        let created_at = 1713261744;
+        let terms = AssetTerms {
+            text: RicardianContract::default(),
+            media: None,
+        };
+        let spec = AssetSpec {
+            ticker: Ticker::try_from("TICKER").unwrap(),
+            name: Name::try_from("NAME").unwrap(),
+            details: None,
+            precision: Precision::try_from(2).unwrap(),
+        };
+        let issued_supply = 999u64;
+        let seal: XChain<BlindSeal<Txid>> = XChain::with(
+            Layer1::Bitcoin,
+            GenesisSeal::from(BlindSeal::with_blinding(
+                CloseMethod::OpretFirst,
+                Txid::from_str("8d54c98d4c29a1ec4fd90635f543f0f7a871a78eb6a6e706342f831d92e3ba19")
+                    .unwrap(),
+                0,
+                654321,
+            )),
+        );
+        let asset_tag = AssetTag::new_deterministic(
+            "contract_domain",
+            AssignmentType::with(0),
+            DateTime::from_timestamp(created_at, 0).unwrap(),
+            123456,
+        );
+
+        let builder = ContractBuilder::with(
+            Rgb20::iface(),
+            NonInflatableAsset::schema(),
+            NonInflatableAsset::issue_impl(),
+            true,
+        )
+        .unwrap()
+        .add_global_state_det("spec", spec, 147)
+        .unwrap()
+        .add_global_state_det("terms", terms, 258)
+        .unwrap()
+        .add_global_state_det("issuedSupply", Amount::from(issued_supply), 369)
+        .unwrap()
+        .add_asset_tag("assetOwner", asset_tag)
+        .unwrap()
+        .add_owned_state_det(
+            "assetOwner",
+            BuilderSeal::from(seal),
+            PersistedState::Amount(
+                issued_supply.into(),
+                BlindingFactor::from_str(
+                    "a3401bcceb26201b55978ff705fecf7d8a0a03598ebeccf2a947030b91a0ff53",
+                )
+                .unwrap(),
+                asset_tag,
+            ),
+        )
+        .unwrap();
+
+        let contract = builder.issue_contract_det(created_at).unwrap();
+
+        assert_eq!(
+            contract.contract_id().to_string(),
+            s!("rgb:ExjQLWS-nMQmKMqVb-cyDvFDqUB-WNnqXkVaP-S8mnDBBe2-UpmPyS")
+        );
+    }
+}
