@@ -172,8 +172,9 @@ impl NonInflatableAsset {
         details: Option<&str>,
         precision: Precision,
         asset_tag: AssetTag,
+        salt: u128,
     ) -> Result<Self, InvalidIdent> {
-        PrimaryIssue::testnet_det::<Self>(ticker, name, details, precision, asset_tag)
+        PrimaryIssue::testnet_det::<Self>(ticker, name, details, precision, asset_tag, salt)
             .map(Self)
     }
 
@@ -285,7 +286,7 @@ mod test {
             123456,
         );
 
-        let builder = ContractBuilder::with(
+        let builder = ContractBuilder::with_det(
             Rgb20::iface(),
             NonInflatableAsset::schema(),
             NonInflatableAsset::issue_impl(),

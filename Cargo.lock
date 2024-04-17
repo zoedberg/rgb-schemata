@@ -680,7 +680,7 @@ dependencies = [
 [[package]]
 name = "rgb-invoice"
 version = "0.11.0-beta.5"
-source = "git+https://github.com/zoedberg/rgb-std?branch=add_global_state_det#c8e7989a83481c05a7a08d0abc582bb3a8338a6f"
+source = "git+https://github.com/zoedberg/rgb-std?branch=assert_deterministic#2a563dc7aaa981b724573116aace192a8d3c558d"
 dependencies = [
  "amplify",
  "baid58",
@@ -716,7 +716,7 @@ dependencies = [
 [[package]]
 name = "rgb-std"
 version = "0.11.0-beta.5"
-source = "git+https://github.com/zoedberg/rgb-std?branch=add_global_state_det#c8e7989a83481c05a7a08d0abc582bb3a8338a6f"
+source = "git+https://github.com/zoedberg/rgb-std?branch=assert_deterministic#2a563dc7aaa981b724573116aace192a8d3c558d"
 dependencies = [
  "amplify",
  "ascii-armor",

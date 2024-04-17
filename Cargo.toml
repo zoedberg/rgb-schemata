@@ -33,4 +33,4 @@ all = ["log"]
 log = ["aluvm/log"]
 
 [patch.crates-io]
-rgb-std = { git = "https://github.com/zoedberg/rgb-std", branch = "add_global_state_det" }
+rgb-std = { git = "https://github.com/zoedberg/rgb-std", branch = "assert_deterministic" }
